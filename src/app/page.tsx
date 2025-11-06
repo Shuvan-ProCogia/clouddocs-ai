@@ -1,15 +1,33 @@
-"use client"
+// src/app/page.tsx
+"use client";
 
-import { CheckCircle, AlertCircle } from "lucide-react";
+import React, { useMemo, useState } from "react";
+import {
+  Cloud,
+  Server,
+  Database,
+  Search,
+  Download,
+  Eye,
+  FileText,
+  Settings,
+  BarChart3,
+  Bell,
+  User,
+  Menu,
+  X,
+  TrendingUp,
+  Play,
+  Loader,
+} from "lucide-react";
 
-import React, { useState } from 'react';
-import { Cloud, Server, Database, Search, Download, Eye, FileText, Settings, BarChart3, Bell, User, Menu, X, TrendingUp, Play, CheckCircle, AlertCircle, Loader } from 'lucide-react';
-
-// TypeScript interfaces
+/* =========================
+   Types
+========================= */
 interface Resource {
   id: string;
   name: string;
-  provider: string;
+  provider: "AWS" | "Azure" | "Snowflake";
   type: string;
   region: string;
   status: string;
@@ -19,50 +37,98 @@ interface Doc {
   id: number;
   resourceId: string;
   title: string;
-  provider: string;
+  provider: Resource["provider"];
   updated: string;
   preview: string;
   fullContent: string;
 }
 
-// Simulated Backend API
+/* =========================
+   Simulated Backend API
+========================= */
 const BackendAPI = {
   async scanAWSResources(): Promise<Resource[]> {
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    await new Promise((r) => setTimeout(r, 1200));
     return [
-      { id: 'aws-1', name: 'prod-web-server-1', provider: 'AWS', type: 'EC2', region: 'us-east-1', status: 'Active' },
-      { id: 'aws-2', name: 'prod-mysql-db', provider: 'AWS', type: 'RDS', region: 'us-east-1', status: 'Active' },
-      { id: 'aws-3', name: 'company-assets', provider: 'AWS', type: 'S3', region: 'us-west-2', status: 'Active' },
+      {
+        id: "aws-1",
+        name: "prod-web-server-1",
+        provider: "AWS",
+        type: "EC2",
+        region: "us-east-1",
+        status: "Active",
+      },
+      {
+        id: "aws-2",
+        name: "prod-mysql-db",
+        provider: "AWS",
+        type: "RDS",
+        region: "us-east-1",
+        status: "Active",
+      },
+      {
+        id: "aws-3",
+        name: "company-assets",
+        provider: "AWS",
+        type: "S3",
+        region: "us-west-2",
+        status: "Active",
+      },
     ];
   },
 
   async scanAzureResources(): Promise<Resource[]> {
-    await new Promise(resolve => setTimeout(resolve, 1800));
+    await new Promise((r) => setTimeout(r, 1100));
     return [
-      { id: 'azure-1', name: 'prod-vm-web-01', provider: 'Azure', type: 'VM', region: 'eastus', status: 'Active' },
-      { id: 'azure-2', name: 'prodstorageacct', provider: 'Azure', type: 'Storage', region: 'westus', status: 'Active' },
+      {
+        id: "azure-1",
+        name: "prod-vm-web-01",
+        provider: "Azure",
+        type: "VM",
+        region: "eastus",
+        status: "Active",
+      },
+      {
+        id: "azure-2",
+        name: "prodstorageacct",
+        provider: "Azure",
+        type: "Storage",
+        region: "westus",
+        status: "Active",
+      },
     ];
   },
 
   async scanSnowflakeResources(): Promise<Resource[]> {
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    await new Promise((r) => setTimeout(r, 900));
     return [
-      { id: 'snow-1', name: 'ANALYTICS_DB', provider: 'Snowflake', type: 'Database', region: 'us-central1', status: 'Active' },
-      { id: 'snow-2', name: 'COMPUTE_WH', provider: 'Snowflake', type: 'Warehouse', region: 'us-central1', status: 'Active' },
+      {
+        id: "snow-1",
+        name: "ANALYTICS_DB",
+        provider: "Snowflake",
+        type: "Database",
+        region: "us-central1",
+        status: "Active",
+      },
+      {
+        id: "snow-2",
+        name: "COMPUTE_WH",
+        provider: "Snowflake",
+        type: "Warehouse",
+        region: "us-central1",
+        status: "Active",
+      },
     ];
   },
 
   async generateDocumentation(resource: Resource): Promise<string> {
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
+    await new Promise((r) => setTimeout(r, 900));
     return `# ${resource.name} - Professional Documentation
 
 ## Executive Summary
-This ${resource.type} resource serves as a critical ${resource.provider} infrastructure component. Deployed in ${resource.region}, it is configured for high availability, security compliance, and optimal performance.
+This ${resource.type} resource is part of ${resource.provider} infrastructure in ${resource.region}. It is configured for availability, security, and performance.
 
 ## Technical Specifications
-
-### Resource Configuration
 - **Resource ID**: ${resource.id}
 - **Provider**: ${resource.provider}
 - **Type**: ${resource.type}
@@ -70,166 +136,239 @@ This ${resource.type} resource serves as a critical ${resource.provider} infrast
 - **Status**: ${resource.status}
 
 ## Security & Compliance
-
-### Security Configuration
 - Encryption at rest: Enabled (AES-256)
 - Encryption in transit: TLS 1.3
-- Access control: Role-based access control (RBAC)
-- Monitoring: 24/7 automated monitoring enabled
-
-### Compliance Status
-✓ SOC 2 Type II compliant
-✓ GDPR data processing standards met
-✓ Automated security patching enabled
-✓ CloudWatch/Azure Monitor active
+- Access control: RBAC
+- Monitoring: 24/7 automated
 
 ## Performance Metrics
-
-### Average Monthly Statistics
 - Uptime: 99.97%
-- Response Time: < 100ms
-- Throughput: High capacity
-- Resource Utilization: Optimized
+- Response Time: <100ms
+- Throughput: High
 
-## Cost Analysis
-
-### Monthly Cost Estimate
-**Total**: $245.50/month
+## Cost (Monthly Est.)
 - Compute: $180.00
 - Storage: $45.50
 - Network: $20.00
+- **Total**: $245.50
 
-### Optimization Opportunities
-1. Consider Reserved Instances for 30% savings
-2. Review resource sizing for potential right-sizing
-3. Implement auto-scaling for cost efficiency
+## Optimization Ideas
+1) Consider Reserved Instances
+2) Right-size workloads
+3) Enable auto scaling
 
 ---
-*Documentation auto-generated by CloudDocs AI on ${new Date().toLocaleString()}*
-*Powered by Claude AI - Professional Infrastructure Documentation*`;
-  }
+*Generated by CloudDocs AI • ${new Date().toLocaleString()}*`;
+  },
 };
 
+/* =========================
+   Toast (simple, robust)
+========================= */
+type ToastKind = "success" | "error" | "info";
+type ToastState = { message: string; type: ToastKind } | null;
+
+function Toast({
+  toast,
+  onClose,
+}: {
+  toast: ToastState;
+  onClose: () => void;
+}) {
+  if (!toast) return null;
+
+  const bg =
+    toast.type === "success"
+      ? "bg-emerald-600"
+      : toast.type === "error"
+      ? "bg-rose-600"
+      : "bg-slate-700";
+
+  const icon =
+    toast.type === "success" ? "✓" : toast.type === "error" ? "!" : "i";
+
+  return (
+    <div className={`fixed top-4 right-4 z-50 ${bg} text-white rounded-lg shadow-lg px-4 py-3 flex items-center gap-3`}>
+      <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-white/20 text-xs">
+        {icon}
+      </span>
+      <span className="text-sm font-medium">{toast.message}</span>
+      <button
+        type="button"
+        aria-label="Close"
+        onClick={onClose}
+        className="ml-2 opacity-80 hover:opacity-100"
+      >
+        <X className="w-4 h-4" />
+      </button>
+    </div>
+  );
+}
+
+/* =========================
+   Page Component
+========================= */
 export default function CloudDocsAI() {
-  const [currentPage, setCurrentPage] = useState('dashboard');
+  const [currentPage, setCurrentPage] = useState<
+    "dashboard" | "resources" | "docs" | "settings"
+  >("dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filterProvider, setFilterProvider] = useState('All');
-  const [selectedDoc, setSelectedDoc] = useState<Doc | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [toast, setToast] = useState<{message: string, type: string} | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterProvider, setFilterProvider] = useState<
+    "All" | "AWS" | "Azure" | "Snowflake"
+  >("All");
+
+  const [toast, setToast] = useState<ToastState>(null);
   const [resources, setResources] = useState<Resource[]>([]);
   const [documentation, setDocumentation] = useState<Doc[]>([]);
-  const [scanStatus, setScanStatus] = useState({ aws: 'idle', azure: 'idle', snowflake: 'idle' });
+  const [scanStatus, setScanStatus] = useState<{
+    aws: "idle" | "scanning" | "complete" | "error";
+    azure: "idle" | "scanning" | "complete" | "error";
+    snowflake: "idle" | "scanning" | "complete" | "error";
+  }>({ aws: "idle", azure: "idle", snowflake: "idle" });
   const [generatingDoc, setGeneratingDoc] = useState<string | null>(null);
+  const [loadingPage, setLoadingPage] = useState(false);
+  const [selectedDoc, setSelectedDoc] = useState<Doc | null>(null);
 
-  const showToast = (message: string, type: string = 'success') => {
+  const showToast = (message: string, type: ToastKind = "success") => {
     setToast({ message, type });
-    setTimeout(() => setToast(null), 3000);
+    setTimeout(() => setToast(null), 2500);
   };
 
-  const handlePageChange = (page: string) => {
-    setLoading(true);
+  const handlePageChange = (page: typeof currentPage) => {
+    setLoadingPage(true);
     setCurrentPage(page);
-    setTimeout(() => setLoading(false), 300);
+    setTimeout(() => setLoadingPage(false), 200);
   };
 
-  const scanProvider = async (provider: string) => {
-    const providerKey = provider.toLowerCase();
-    setScanStatus(prev => ({ ...prev, [providerKey]: 'scanning' }));
-    showToast(`Scanning ${provider} resources...`, 'info');
+  const scanProvider = async (provider: Resource["provider"]) => {
+    const key = provider.toLowerCase() as "aws" | "azure" | "snowflake";
+    setScanStatus((s) => ({ ...s, [key]: "scanning" }));
+    showToast(`Scanning ${provider} resources...`, "info");
 
     try {
       let newResources: Resource[] = [];
-      if (provider === 'AWS') {
-        newResources = await BackendAPI.scanAWSResources();
-      } else if (provider === 'Azure') {
+      if (provider === "AWS") newResources = await BackendAPI.scanAWSResources();
+      if (provider === "Azure")
         newResources = await BackendAPI.scanAzureResources();
-      } else if (provider === 'Snowflake') {
+      if (provider === "Snowflake")
         newResources = await BackendAPI.scanSnowflakeResources();
-      }
 
-      setResources(prev => [...prev.filter(r => r.provider !== provider), ...newResources]);
-      setScanStatus(prev => ({ ...prev, [providerKey]: 'complete' }));
-      showToast(`Found ${newResources.length} ${provider} resources!`, 'success');
+      setResources((prev) => [
+        ...prev.filter((r) => r.provider !== provider),
+        ...newResources,
+      ]);
+      setScanStatus((s) => ({ ...s, [key]: "complete" }));
+      showToast(`Found ${newResources.length} ${provider} resources!`, "success");
 
-      if (newResources.length > 0) {
-        setTimeout(() => generateDoc(newResources[0]), 1000);
+      if (newResources.length) {
+        // auto-generate first resource doc (demo)
+        setTimeout(() => generateDoc(newResources[0]), 600);
       }
-    } catch (error) {
-      setScanStatus(prev => ({ ...prev, [providerKey]: 'error' }));
-      showToast(`Error scanning ${provider}`, 'error');
+    } catch {
+      setScanStatus((s) => ({ ...s, [key]: "error" }));
+      showToast(`Failed to scan ${provider}`, "error");
     }
   };
 
   const generateDoc = async (resource: Resource) => {
     setGeneratingDoc(resource.id);
-    showToast(`Generating AI documentation for ${resource.name}...`, 'info');
+    showToast(`Generating docs for ${resource.name}...`, "info");
 
     try {
-      const docContent = await BackendAPI.generateDocumentation(resource);
+      const content = await BackendAPI.generateDocumentation(resource);
       const newDoc: Doc = {
         id: documentation.length + 1,
         resourceId: resource.id,
         title: `${resource.name} Documentation`,
         provider: resource.provider,
         updated: new Date().toLocaleDateString(),
-        preview: docContent.substring(0, 150) + '...',
-        fullContent: docContent
+        preview: content.slice(0, 160) + "...",
+        fullContent: content,
       };
-
-      setDocumentation(prev => [...prev, newDoc]);
+      setDocumentation((prev) => [newDoc, ...prev]);
       setGeneratingDoc(null);
-      showToast(`Documentation generated for ${resource.name}!`, 'success');
-    } catch (error) {
+      showToast(`Documentation ready for ${resource.name}`, "success");
+      setSelectedDoc(newDoc);
+    } catch {
       setGeneratingDoc(null);
-      showToast(`Error generating documentation`, 'error');
+      showToast("Error generating documentation", "error");
     }
   };
 
-  const providerColors: {[key: string]: string} = {
-    AWS: 'bg-orange-500',
-    Azure: 'bg-blue-500',
-    Snowflake: 'bg-cyan-500'
+  const providerColors: Record<Resource["provider"], string> = {
+    AWS: "bg-orange-500",
+    Azure: "bg-blue-600",
+    Snowflake: "bg-cyan-600",
   };
 
-  const filteredResources = resources.filter(r => {
-    const matchesSearch = r.name.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesProvider = filterProvider === 'All' || r.provider === filterProvider;
-    return matchesSearch && matchesProvider;
-  });
+  const filteredResources = useMemo(() => {
+    return resources.filter((r) => {
+      const s = searchQuery.trim().toLowerCase();
+      const matchesSearch =
+        !s ||
+        r.name.toLowerCase().includes(s) ||
+        r.type.toLowerCase().includes(s) ||
+        r.region.toLowerCase().includes(s);
+      const matchesProvider = filterProvider === "All" || r.provider === filterProvider;
+      return matchesSearch && matchesProvider;
+    });
+  }, [resources, searchQuery, filterProvider]);
 
   const stats = [
-    { label: 'AWS Resources', value: resources.filter(r => r.provider === 'AWS').length.toString(), trend: '+12%', icon: Cloud, color: 'bg-blue-500' },
-    { label: 'Azure Resources', value: resources.filter(r => r.provider === 'Azure').length.toString(), trend: '+8%', icon: Server, color: 'bg-cyan-500' },
-    { label: 'Snowflake Resources', value: resources.filter(r => r.provider === 'Snowflake').length.toString(), trend: '+15%', icon: Database, color: 'bg-indigo-500' },
+    {
+      label: "AWS Resources",
+      value: resources.filter((r) => r.provider === "AWS").length.toString(),
+      trend: "+12%",
+      icon: Cloud,
+      color: "from-orange-500 to-rose-500",
+    },
+    {
+      label: "Azure Resources",
+      value: resources.filter((r) => r.provider === "Azure").length.toString(),
+      trend: "+8%",
+      icon: Server,
+      color: "from-blue-600 to-indigo-600",
+    },
+    {
+      label: "Snowflake Resources",
+      value: resources.filter((r) => r.provider === "Snowflake").length.toString(),
+      trend: "+15%",
+      icon: Database,
+      color: "from-cyan-600 to-teal-600",
+    },
   ];
 
+  /* ========== UI Partials ========== */
   const Sidebar = () => (
-    <div className={`${sidebarOpen ? 'w-64' : 'w-20'} bg-slate-900 border-r border-slate-800 transition-all duration-300 flex flex-col hidden md:flex`}>
+    <aside
+      className={`${
+        sidebarOpen ? "w-64" : "w-20"
+      } bg-slate-900 border-r border-slate-800 transition-all duration-300 hidden md:flex flex-col`}
+    >
       <div className="p-4 border-b border-slate-800">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg grid place-items-center">
             <Cloud className="w-6 h-6 text-white" />
           </div>
           {sidebarOpen && <span className="font-bold text-xl text-white">CloudDocs AI</span>}
         </div>
       </div>
-      
-      <nav className="flex-1 p-4 space-y-2">
+
+      <nav className="flex-1 p-3 space-y-2">
         {[
-          { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
-          { id: 'resources', label: 'Resources', icon: Server },
-          { id: 'docs', label: 'Documentation', icon: FileText },
-          { id: 'settings', label: 'Settings', icon: Settings },
-        ].map(item => (
+          { id: "dashboard", label: "Dashboard", icon: BarChart3 },
+          { id: "resources", label: "Resources", icon: Server },
+          { id: "docs", label: "Documentation", icon: FileText },
+          { id: "settings", label: "Settings", icon: Settings },
+        ].map((item) => (
           <button
             key={item.id}
-            onClick={() => handlePageChange(item.id)}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
-              currentPage === item.id 
-                ? 'bg-blue-600 text-white' 
-                : 'text-slate-400 hover:bg-slate-800 hover:text-white'
+            onClick={() => handlePageChange(item.id as any)}
+            className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition ${
+              currentPage === item.id
+                ? "bg-blue-600 text-white"
+                : "text-slate-300 hover:bg-slate-800 hover:text-white"
             }`}
           >
             <item.icon className="w-5 h-5" />
@@ -237,36 +376,322 @@ export default function CloudDocsAI() {
           </button>
         ))}
       </nav>
-      
+
       <div className="p-4 border-t border-slate-800">
         <button
-          onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition-all"
+          onClick={() => setSidebarOpen((s) => !s)}
+          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition"
         >
           {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           {sidebarOpen && <span>Collapse</span>}
         </button>
       </div>
-    </div>
+    </aside>
   );
 
   const Navbar = () => (
-    <div className="h-16 bg-slate-900 border-b border-slate-800 flex items-center justify-between px-6">
-      <h1 className="text-xl font-semibold text-white capitalize">{currentPage}</h1>
-      <div className="flex items-center gap-4">
-        <button className="w-10 h-10 rounded-lg bg-slate-800 flex items-center justify-center text-slate-400 hover:text-white transition-colors">
+    <div className="h-16 bg-slate-900 border-b border-slate-800 flex items-center justify-between px-4 md:px-6">
+      <h1 className="text-white text-lg md:text-xl font-semibold capitalize">{currentPage}</h1>
+      <div className="flex items-center gap-3">
+        <button className="w-10 h-10 rounded-lg bg-slate-800 grid place-items-center text-slate-300 hover:text-white transition">
           <Bell className="w-5 h-5" />
         </button>
-        <button className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white">
+        <button className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 grid place-items-center text-white">
           <User className="w-5 h-5" />
         </button>
       </div>
     </div>
   );
 
-  const Toast = () => toast && (
-    <div className={`fixed top-4 right-4 z-50 px-6 py-4 rounded-lg shadow-lg flex items-center gap-3 ${
-      toast.type === 'success' ? 'bg-green-600' : toast.type === 'error' ? 'bg-red-600' : 'bg-blue-600'
-       } text-white`}>
-    {toast?.type === 'success' && <span>✓</span>}
-{toast?.type === 'error'   && <span>!</span>}
+  /* ========== Pages ========== */
+  const Dashboard = () => (
+    <div className="p-4 md:p-6 space-y-6">
+      {/* Stats */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {stats.map((s) => (
+          <div
+            key={s.label}
+            className="rounded-xl bg-slate-900 border border-slate-800 overflow-hidden"
+          >
+            <div className={`h-1 bg-gradient-to-r ${s.color}`} />
+            <div className="p-4 flex items-center justify-between">
+              <div>
+                <p className="text-slate-400 text-sm">{s.label}</p>
+                <p className="text-white text-2xl font-bold mt-1">{s.value}</p>
+                <p className="text-emerald-400 text-xs mt-1 inline-flex items-center gap-1">
+                  <TrendingUp className="w-3 h-3" /> {s.trend}
+                </p>
+              </div>
+              <div className="w-10 h-10 rounded-lg bg-slate-800 grid place-items-center">
+                <s.icon className="w-5 h-5 text-white" />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Actions */}
+      <div className="rounded-xl bg-slate-900 border border-slate-800 p-4">
+        <h2 className="text-white font-semibold mb-3">Quick Actions</h2>
+        <div className="flex flex-wrap gap-3">
+          <button
+            onClick={() => scanProvider("AWS")}
+            className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-orange-600 text-white hover:opacity-90"
+            disabled={scanStatus.aws === "scanning"}
+          >
+            {scanStatus.aws === "scanning" ? (
+              <Loader className="w-4 h-4 animate-spin" />
+            ) : (
+              <Cloud className="w-4 h-4" />
+            )}
+            Scan AWS
+          </button>
+          <button
+            onClick={() => scanProvider("Azure")}
+            className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-blue-600 text-white hover:opacity-90"
+            disabled={scanStatus.azure === "scanning"}
+          >
+            {scanStatus.azure === "scanning" ? (
+              <Loader className="w-4 h-4 animate-spin" />
+            ) : (
+              <Server className="w-4 h-4" />
+            )}
+            Scan Azure
+          </button>
+          <button
+            onClick={() => scanProvider("Snowflake")}
+            className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-cyan-600 text-white hover:opacity-90"
+            disabled={scanStatus.snowflake === "scanning"}
+          >
+            {scanStatus.snowflake === "scanning" ? (
+              <Loader className="w-4 h-4 animate-spin" />
+            ) : (
+              <Database className="w-4 h-4" />
+            )}
+            Scan Snowflake
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
+  const Resources = () => (
+    <div className="p-4 md:p-6 space-y-4">
+      <div className="flex flex-col md:flex-row gap-3 md:items-center">
+        <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 flex-1">
+          <Search className="w-4 h-4" />
+          <input
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="bg-transparent outline-none flex-1 text-sm"
+            placeholder="Search resources..."
+          />
+        </div>
+        <select
+          className="px-3 py-2 rounded-lg bg-slate-900 border border-slate-800 text-slate-200"
+          value={filterProvider}
+          onChange={(e) => setFilterProvider(e.target.value as any)}
+        >
+          <option>All</option>
+          <option>AWS</option>
+          <option>Azure</option>
+          <option>Snowflake</option>
+        </select>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {filteredResources.map((r) => (
+          <div
+            key={r.id}
+            className="rounded-xl bg-slate-900 border border-slate-800 p-4 space-y-3"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div
+                  className={`w-10 h-10 rounded-lg grid place-items-center ${
+                    providerColors[r.provider]
+                  } text-white`}
+                >
+                  {r.provider === "AWS" && <Cloud className="w-5 h-5" />}
+                  {r.provider === "Azure" && <Server className="w-5 h-5" />}
+                  {r.provider === "Snowflake" && <Database className="w-5 h-5" />}
+                </div>
+                <div>
+                  <p className="text-white font-medium">{r.name}</p>
+                  <p className="text-slate-400 text-xs">
+                    {r.type} • {r.region}
+                  </p>
+                </div>
+              </div>
+              <span className="text-xs px-2 py-1 rounded bg-slate-800 text-slate-300">
+                {r.status}
+              </span>
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => generateDoc(r)}
+                disabled={generatingDoc === r.id}
+                className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-blue-600 text-white hover:opacity-90 disabled:opacity-60"
+              >
+                {generatingDoc === r.id ? (
+                  <Loader className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Play className="w-4 h-4" />
+                )}
+                Generate Docs
+              </button>
+              <button className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-800 text-slate-200 hover:bg-slate-700">
+                <Eye className="w-4 h-4" />
+                Inspect
+              </button>
+            </div>
+          </div>
+        ))}
+
+        {filteredResources.length === 0 && (
+          <div className="col-span-full text-center text-slate-400 border border-dashed border-slate-700 rounded-xl p-10">
+            No resources yet. Try scanning a provider from the Dashboard.
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
+  const Docs = () => (
+    <div className="p-4 md:p-6 space-y-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {documentation.map((d) => (
+          <div
+            key={d.id}
+            className="rounded-xl bg-slate-900 border border-slate-800 p-4 space-y-3"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div
+                  className={`w-10 h-10 rounded-lg grid place-items-center ${
+                    providerColors[d.provider]
+                  } text-white`}
+                >
+                  {d.provider === "AWS" && <Cloud className="w-5 h-5" />}
+                  {d.provider === "Azure" && <Server className="w-5 h-5" />}
+                  {d.provider === "Snowflake" && <Database className="w-5 h-5" />}
+                </div>
+                <div>
+                  <p className="text-white font-medium">{d.title}</p>
+                  <p className="text-slate-400 text-xs">
+                    Updated {d.updated}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setSelectedDoc(d)}
+                className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-800 text-slate-200 hover:bg-slate-700"
+              >
+                <Eye className="w-4 h-4" /> View
+              </button>
+            </div>
+            <p className="text-slate-300 text-sm leading-6">{d.preview}</p>
+            <div className="flex gap-2">
+              <button className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-blue-600 text-white hover:opacity-90">
+                <Download className="w-4 h-4" />
+                Export
+              </button>
+              <button className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-800 text-slate-200 hover:bg-slate-700">
+                <FileText className="w-4 h-4" />
+                Copy
+              </button>
+            </div>
+          </div>
+        ))}
+
+        {documentation.length === 0 && (
+          <div className="col-span-full text-center text-slate-400 border border-dashed border-slate-700 rounded-xl p-10">
+            No documentation yet. Generate docs from the Resources page.
+          </div>
+        )}
+      </div>
+
+      {/* Doc Modal */}
+      {selectedDoc && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm grid place-items-center p-4">
+          <div className="w-full max-w-4xl bg-slate-950 border border-slate-800 rounded-xl overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-slate-800">
+              <p className="text-white font-semibold">{selectedDoc.title}</p>
+              <button
+                onClick={() => setSelectedDoc(null)}
+                className="text-slate-300 hover:text-white"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="max-h-[70vh] overflow-auto p-4">
+              <pre className="whitespace-pre-wrap text-slate-200 text-sm leading-6">
+                {selectedDoc.fullContent}
+              </pre>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+
+  const SettingsPage = () => (
+    <div className="p-4 md:p-6 space-y-4">
+      <div className="rounded-xl bg-slate-900 border border-slate-800 p-4">
+        <p className="text-white font-semibold mb-2">App Settings</p>
+        <div className="grid sm:grid-cols-2 gap-4">
+          <div className="flex items-center justify-between rounded-lg bg-slate-800 p-3">
+            <span className="text-slate-200 text-sm">Email Notifications</span>
+            <span className="text-slate-400 text-xs">Coming soon</span>
+          </div>
+          <div className="flex items-center justify-between rounded-lg bg-slate-800 p-3">
+            <span className="text-slate-200 text-sm">Export Format</span>
+            <span className="text-slate-400 text-xs">Markdown</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="min-h-dvh bg-slate-950 text-slate-200 flex">
+      {/* Sidebar */}
+      <Sidebar />
+
+      {/* Main */}
+      <div className="flex-1 flex flex-col">
+        {/* Navbar */}
+        <Navbar />
+
+        {/* Content */}
+        {loadingPage ? (
+          <div className="flex-1 grid place-items-center">
+            <div className="inline-flex items-center gap-2 text-slate-300">
+              <Loader className="w-5 h-5 animate-spin" /> Loading...
+            </div>
+          </div>
+        ) : currentPage === "dashboard" ? (
+          <Dashboard />
+        ) : currentPage === "resources" ? (
+          <Resources />
+        ) : currentPage === "docs" ? (
+          <Docs />
+        ) : (
+          <SettingsPage />
+        )}
+      </div>
+
+      {/* Toast */}
+      <Toast toast={toast} onClose={() => setToast(null)} />
+    </div>
+  );
+}
+
+/* =========================
+   Notes:
+   - Ensure package.json has:
+     "build": "next build",
+     "start": "next start -p $PORT"
+   - Install icons if not already:
+     npm i lucide-react
+========================= */
