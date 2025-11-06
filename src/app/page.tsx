@@ -1,5 +1,7 @@
 "use client"
 
+import { CheckCircle, AlertCircle } from "lucide-react";
+
 import React, { useState } from 'react';
 import { Cloud, Server, Database, Search, Download, Eye, FileText, Settings, BarChart3, Bell, User, Menu, X, TrendingUp, Play, CheckCircle, AlertCircle, Loader } from 'lucide-react';
 
@@ -265,6 +267,6 @@ export default function CloudDocsAI() {
   const Toast = () => toast && (
     <div className={`fixed top-4 right-4 z-50 px-6 py-4 rounded-lg shadow-lg flex items-center gap-3 ${
       toast.type === 'success' ? 'bg-green-600' : toast.type === 'error' ? 'bg-red-600' : 'bg-blue-600'
-    } text-white`}>
-      {toast.type === 'success' && <CheckCircle className="w-5 h-5" />}
-      {toast.type === 'error' && <Aler
+       } text-white`}>
+    {toast?.type === 'success' && <span>✓</span>}
+{toast?.type === 'error'   && <span>!</span>}
